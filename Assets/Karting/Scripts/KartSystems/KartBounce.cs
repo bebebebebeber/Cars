@@ -18,7 +18,7 @@ namespace KartGame.KartSystems
         [Tooltip("How much impulse should be applied to the kart when it collides?")]
         public float BounceFactor = 10f;
         [Tooltip("How fast should the kart reorient itself when colliding? The higher the value the more snappy it looks")]
-        public float RotationSpeed = 3f;
+        public float RotationSpeed = 300f;
         [Tooltip("What layer should this GameObject collider with?")]
         public LayerMask CollisionLayer;
         [Tooltip("How far ahead should the vehicle detect a bounce? This should be a positive value!")]

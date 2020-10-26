@@ -104,8 +104,8 @@ namespace KartGame.KartSystems
             rearLeftWheel.Setup();
             rearRightWheel.Setup();
 
-            m_InverseFrontWheelRadius = 1f / frontWheelRadius;
-            m_InverseRearWheelRadius = 1f / rearWheelRadius;
+            m_InverseFrontWheelRadius = 100f / frontWheelRadius;
+            m_InverseRearWheelRadius = 100f / rearWheelRadius;
         }
 
         void FixedUpdate() 
@@ -124,7 +124,7 @@ namespace KartGame.KartSystems
             frontLeftWheel.SetToDefaultRotation();
             frontRightWheel.SetToDefaultRotation();
 
-            float speed = kartController.LocalSpeed() * 10f;
+            float speed = kartController.LocalSpeed() * 1000f;
             float rotationAngle = speed * Time.deltaTime * m_InverseFrontWheelRadius * Mathf.Rad2Deg;
             frontLeftWheel.TurnWheel(rotationAngle);
             frontRightWheel.TurnWheel(rotationAngle);
