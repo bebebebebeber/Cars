@@ -25,7 +25,8 @@ public class Connect : MonoBehaviour
     public void Click(bool active)
     {
         Debug.Log("------------");
-        Network.GetData();
+        Network.PostData("bybyn", new Vector3(0, 1, 2), new Vector3(0, 1, 2));
+        Network.GetData("bybyn");
     }
 
     // Update is called once per frame
@@ -37,16 +38,11 @@ public class Connect : MonoBehaviour
 
 }
 
-class Model
-{
-    public int UserId { get; set; }
-    public string Title { get; set; }
-}
 public class Network
 {
-    public static async Task<PositionCollider> GetData()
+    public static async Task<PositionCollider> GetData(string nick)
     {
-        string url = "https://jsonplaceholder.typicode.com/todos/1";
+        string url = "https://fastdostavka.ga/api/CarsConroller/"+nick;
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
         request.Method = "GET";
         var webResponse = request.GetResponse();
@@ -54,15 +50,14 @@ public class Network
         var responseReader = new StreamReader(webStream);
         string response = responseReader.ReadToEnd();
         Debug.Log("------------" + response);
-        Model m = JsonConvert.DeserializeObject<Model>(response);
+        PositionCollider pc = JsonConvert.DeserializeObject<PositionCollider>(response);
         responseReader.Close();
-        PositionCollider pc = null;
         return pc;
     }
 
     public static void PostData(string nick, Vector3 pos, Vector3 velocity)
     {
-        var httpWebRequest = (HttpWebRequest)WebRequest.Create("http://91.238.103.45:200/api/game");
+        var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://fastdostavka.ga/api/CarsConroller");
         httpWebRequest.ContentType = "application/json";
         httpWebRequest.Method = "POST";
         using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
