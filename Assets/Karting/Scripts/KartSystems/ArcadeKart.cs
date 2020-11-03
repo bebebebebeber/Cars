@@ -147,39 +147,62 @@ namespace KartGame.KartSystems
         }
         async void connect(Vector3 c)
         {
-            IPAddress ip = IPAddress.Parse("95.214.10.36");//IPAddress.Parse("127.0.0.1"); //Dns.GetHostAddresses("google.com.ua")[0];
-            IPEndPoint ep = new IPEndPoint(ip, 560);
-            Socket s = new Socket(AddressFamily.InterNetwork,
-                SocketType.Stream, ProtocolType.IP);
             try
             {
-                await s.ConnectAsync(ep);
-                if (s.Connected)
-                {
-                    string strSend = c.ToString();//"Привіт. Я debil. ya kablan\r\n\r\n";
-                    //SocketAsyncEventArgs e = new SocketAsyncEventArgs();
-                    //e.SetBuffer(buffer, 0, buffer.Length);
-                    s.Send(Encoding.UTF8.GetBytes(strSend));
-                    byte[] buffer = new byte[1024];
-                    int l;
-                    do
-                    {
-                         l =  s.Receive(buffer);
-                        //txtMesssage.Text += Encoding.UTF8.GetString(buffer, 0, l);
-                    } while (l > 0);
-                    //txtMesssage.Text = "Connected good";
-                }
+                Eastern eastern = new Eastern();
+                eastern.Connect("95.214.10.36", 560);
+            }
+            catch { }
+            //IPAddress ip = IPAddress.Parse("95.214.10.36");//IPAddress.Parse("127.0.0.1"); //Dns.GetHostAddresses("google.com.ua")[0];
+            //IPEndPoint ep = new IPEndPoint(ip, 560);
+            //Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+            //try
+            //{
+            //    await s.ConnectAsync(ep);
+            //    if (s.Connected)
+            //    {
+            //        string strSend = c.ToString();//"Привіт. Я debil. ya kablan\r\n\r\n";
+            //        //SocketAsyncEventArgs e = new SocketAsyncEventArgs();
+            //        //e.SetBuffer(buffer, 0, buffer.Length);
+            //        s.Send(Encoding.UTF8.GetBytes(strSend));
+            //        byte[] buffer = new byte[1024];
+            //        int l;
+            //        do
+            //        {
+            //             //l =  s.Receive(buffer);
+            //            //txtMesssage.Text += Encoding.UTF8.GetString(buffer, 0, l);
+            //        } while (l > 0);
+            //        //txtMesssage.Text = "Connected good";
+            //    }
 
-            }
-            catch (Exception ex)
+            //}
+            //catch (Exception ex)
+            //{
+            //}
+            //finally
+            //{
+            //    s.Shutdown(SocketShutdown.Both);
+            //    s.Close();
+            //}
+        }
+
+        private void SendCallback(object sender, SocketAsyncEventArgs e)
+        {
+            if (e.SocketError == SocketError.Success)
             {
+                // You may need to specify some type of state and 
+                // pass it into the BeginSend method so you don't start
+                // sending from scratch
+                //BeginSend();
             }
-            finally
+            else
             {
-                s.Shutdown(SocketShutdown.Both);
-                s.Close();
+                //Console.WriteLine("Socket Error: {0} when sending to {1}",
+                //       e.SocketError,
+                //       _asyncTask.Host);
             }
         }
+
         void FixedUpdate()
         {
             ResetIfStuck();
