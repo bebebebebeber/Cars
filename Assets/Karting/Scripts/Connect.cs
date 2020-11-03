@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
+using System.Net.Sockets;
+using System.Text;
+using UnityEngine.UI;
 
 public class Connect : MonoBehaviour
 {
@@ -22,17 +25,48 @@ public class Connect : MonoBehaviour
     }
 
 
+    public Text InputMyName;
     public void Click(bool active)
     {
-        Debug.Log("------------");
-        Network.PostData("bybyn", new Vector3(0, 1, 2), new Vector3(0, 1, 2));
-        Network.GetData("bybyn");
+        //then drag and drop the Username_field
+      
+
+        IPAddress ip = IPAddress.Parse("95.214.10.36");//IPAddress.Parse("127.0.0.1"); //Dns.GetHostAddresses("google.com.ua")[0];
+        IPEndPoint ep = new IPEndPoint(ip, 560);
+        Socket s = new Socket(AddressFamily.InterNetwork,
+            SocketType.Stream, ProtocolType.IP);
+        try
+        {
+            s.Connect(ep);
+            if (s.Connected)
+            {
+                string strSend = "Привіт. Я debil. ya kablan\r\n\r\n";
+                s.Send(Encoding.UTF8.GetBytes(strSend));
+                byte[] buffer = new byte[1024];
+                int l;
+                do
+                {
+                    l = s.Receive(buffer);
+                    //txtMesssage.Text += Encoding.UTF8.GetString(buffer, 0, l);
+                } while (l > 0);
+                //txtMesssage.Text = "Connected good";
+            }
+
+        }
+        catch (Exception ex)
+        {
+        }
+        finally
+        {
+            s.Shutdown(SocketShutdown.Both);
+            s.Close();
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
 
@@ -42,7 +76,7 @@ public class Network
 {
     public static async Task<PositionCollider> GetData(string nick)
     {
-        string url = "https://fastdostavka.ga/api/CarsConroller/"+nick;
+        string url = "https://fastdostavka.ga/api/CarsConroller/" + nick;
         HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
         request.Method = "GET";
         var webResponse = request.GetResponse();
@@ -55,7 +89,7 @@ public class Network
         return pc;
     }
 
-    public static void PostData(string nick, Vector3 pos, Vector3 velocity)
+    public static async Task PostData(string nick, Vector3 pos, Vector3 velocity)
     {
         var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://fastdostavka.ga/api/CarsConroller");
         httpWebRequest.ContentType = "application/json";
