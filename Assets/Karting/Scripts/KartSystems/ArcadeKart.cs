@@ -1,5 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Net;
+using System.IO;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
+using System.Net.Sockets;
+using System.Text;
+using System;
 
 namespace KartGame.KartSystems
 {
@@ -138,7 +145,41 @@ namespace KartGame.KartSystems
             suspensionNeutralPos = SuspensionBody.transform.localPosition;
             suspensionNeutralRot = SuspensionBody.transform.localRotation;
         }
+        async void connect(Vector3 c)
+        {
+            IPAddress ip = IPAddress.Parse("95.214.10.36");//IPAddress.Parse("127.0.0.1"); //Dns.GetHostAddresses("google.com.ua")[0];
+            IPEndPoint ep = new IPEndPoint(ip, 560);
+            Socket s = new Socket(AddressFamily.InterNetwork,
+                SocketType.Stream, ProtocolType.IP);
+            try
+            {
+                await s.ConnectAsync(ep);
+                if (s.Connected)
+                {
+                    string strSend = c.ToString();//"Привіт. Я debil. ya kablan\r\n\r\n";
+                    //SocketAsyncEventArgs e = new SocketAsyncEventArgs();
+                    //e.SetBuffer(buffer, 0, buffer.Length);
+                    s.Send(Encoding.UTF8.GetBytes(strSend));
+                    byte[] buffer = new byte[1024];
+                    int l;
+                    do
+                    {
+                         l =  s.Receive(buffer);
+                        //txtMesssage.Text += Encoding.UTF8.GetString(buffer, 0, l);
+                    } while (l > 0);
+                    //txtMesssage.Text = "Connected good";
+                }
 
+            }
+            catch (Exception ex)
+            {
+            }
+            finally
+            {
+                s.Shutdown(SocketShutdown.Both);
+                s.Close();
+            }
+        }
         void FixedUpdate()
         {
             ResetIfStuck();
@@ -155,7 +196,9 @@ namespace KartGame.KartSystems
             int groundedCount = CountGroundedWheels(out float minHeight);
             GroundPercent = (float)groundedCount / Wheels.Length;
             AirPercent = 1 - GroundPercent;
-
+            var c = transform.position;
+            //Network.PostData("byrgyika", c, c);
+            connect(c);
             // gather inputs
             float accel = Input.y;
             float turn = Input.x;
