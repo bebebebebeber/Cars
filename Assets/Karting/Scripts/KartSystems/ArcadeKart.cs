@@ -23,7 +23,7 @@ namespace KartGame.KartSystems
             public float ElapsedTime;
             public float MaxTime;
         }
-
+    
         /// <summary>
         /// Contains a series tunable parameters to tweak various karts for unique driving mechanics.
         /// </summary>
@@ -91,6 +91,7 @@ namespace KartGame.KartSystems
         public Vector2 Input       { get; private set; }
         public float AirPercent    { get; private set; }
         public float GroundPercent { get; private set; }
+        
 
         public ArcadeKart.Stats baseStats = new ArcadeKart.Stats
         {
@@ -145,6 +146,57 @@ namespace KartGame.KartSystems
             suspensionNeutralPos = SuspensionBody.transform.localPosition;
             suspensionNeutralRot = SuspensionBody.transform.localRotation;
         }
+        private static void ReceiveCallback(IAsyncResult ar)
+        {
+            try
+            {
+                // Retrieve the state object and the client socket
+                // from the asynchronous state object.  
+                var r = ar.AsyncState;
+                StateObject state = (StateObject)ar.AsyncState;
+                string resp1 = Encoding.UTF8.GetString(state.buffer);
+                //Socket client = state.workSocket;
+
+                // Read data from the remote device.  
+                //int bytesRead = client.EndReceive(ar);
+
+                //if (bytesRead > 0)
+                //{
+                //    // There might be more data, so store the data received so far.  
+                //    //state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+                //    string resp = Encoding.UTF8.GetString(state.buffer, 0, bytesRead);
+                //    // Get the rest of the data.  
+                //    //client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                //    //    new AsyncCallback(ReceiveCallback), state);
+                //}
+                //else
+                //{
+                //    // All the data has arrived; put it in response.  
+                //    if (state.sb.Length > 1)
+                //    {
+                //        var response = state.sb.ToString();
+                //    }
+                //    // Signal that all bytes have been received.  
+                //    //receiveDone.Set();
+                //}
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+        public class StateObject
+        {
+            // Client socket.  
+            public Socket workSocket = null;
+            // Size of receive buffer.  
+            public const int BufferSize = 1024;
+            // Receive buffer.  
+            public byte[] buffer = new byte[BufferSize];
+            // Received data string.  
+            public StringBuilder sb = new StringBuilder();
+        }
+
         async void connect(Vector3 c)
         {
             IPAddress ip = IPAddress.Parse("95.214.10.36");//IPAddress.Parse("127.0.0.1"); //Dns.GetHostAddresses("google.com.ua")[0];
@@ -157,16 +209,22 @@ namespace KartGame.KartSystems
                 if (s.Connected)
                 {
                     string strSend = c.ToString();//"Привіт. Я debil. ya kablan\r\n\r\n";
-                    //SocketAsyncEventArgs e = new SocketAsyncEventArgs();
-                    //e.SetBuffer(buffer, 0, buffer.Length);
+                                                  //SocketAsyncEventArgs e = new SocketAsyncEventArgs();
+                                                  //e.SetBuffer(buffer, 0, buffer.Length);
                     s.Send(Encoding.UTF8.GetBytes(strSend));
                     byte[] buffer = new byte[1024];
-                    int l;
-                    do
-                    {
-                         l =  s.Receive(buffer);
-                        //txtMesssage.Text += Encoding.UTF8.GetString(buffer, 0, l);
-                    } while (l > 0);
+                    StateObject state = new StateObject();
+                    state.workSocket = s;
+                    state.buffer = buffer;
+                    s.BeginReceive(buffer, 0, buffer.Length, 0,
+                    new AsyncCallback(ReceiveCallback), state);
+                    
+                    //int l;
+                    //do
+                    //{
+                    //     l =  s.Receive(buffer);
+                    //    //txtMesssage.Text += Encoding.UTF8.GetString(buffer, 0, l);
+                    //} while (l > 0);
                     //txtMesssage.Text = "Connected good";
                 }
 
@@ -199,8 +257,9 @@ namespace KartGame.KartSystems
             var c = transform.position;
             //Network.PostData("byrgyika", c, c);
             connect(c);
-            // gather inputs
-            float accel = Input.y;
+            
+                // gather inputs
+                float accel = Input.y;
             float turn = Input.x;
 
             // apply vehicle physics
