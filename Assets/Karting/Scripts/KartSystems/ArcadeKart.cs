@@ -10,6 +10,33 @@ using System;
 
 namespace KartGame.KartSystems
 {
+    enum CommandPlayEnum
+    {
+        Connect = 0,
+        Playing = 1
+    }
+    class Vector
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
+        public override string ToString()
+        {
+            return $"{X} {Y} {Z}";
+        }
+    }
+    class Play
+    {
+        public string Name { get; set; }
+        public bool IsOne { get; set; }
+        public Vector Position { get; set; }
+        public CommandPlayEnum Command { get; set; }
+        public override string ToString()
+        {
+            return $"Name: {Name}\t IsONe: {IsOne}\t " +
+                $"Position: {Position}\t Command: {Command}";
+        }
+    }
     public class ArcadeKart : MonoBehaviour
     {
         /// <summary>
@@ -211,7 +238,20 @@ namespace KartGame.KartSystems
                     string strSend = c.ToString();//"Привіт. Я debil. ya kablan\r\n\r\n";
                                                   //SocketAsyncEventArgs e = new SocketAsyncEventArgs();
                                                   //e.SetBuffer(buffer, 0, buffer.Length);
-                    s.Send(Encoding.UTF8.GetBytes(strSend));
+                    Play play = new Play()
+                    {
+                        IsOne = true,
+                        Command = CommandPlayEnum.Playing,
+                        Name ="Daniyl",
+                        Position = new Vector()
+                        {
+                            X = c.x,
+                            Y = c.y,
+                            Z= c.z
+                        }
+                    };
+                    var json = JsonConvert.SerializeObject(play);
+                    s.Send( Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(play)));
                     byte[] buffer = new byte[1024];
                     StateObject state = new StateObject();
                     state.workSocket = s;
