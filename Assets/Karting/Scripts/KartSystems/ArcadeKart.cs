@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Text;
 using System;
+using System.Threading;
 
 namespace KartGame.KartSystems
 {
@@ -182,19 +183,17 @@ namespace KartGame.KartSystems
                 var r = ar.AsyncState;
                 StateObject state = (StateObject)ar.AsyncState;
                 string resp1 = Encoding.UTF8.GetString(state.buffer);
-                //Socket client = state.workSocket;
-
-                // Read data from the remote device.  
+                Socket client = state.workSocket;
+                Thread.Sleep(20);
+                //Read data from the remote device.
                 //int bytesRead = client.EndReceive(ar);
 
-                //if (bytesRead > 0)
-                //{
-                //    // There might be more data, so store the data received so far.  
-                //    //state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-                //    string resp = Encoding.UTF8.GetString(state.buffer, 0, bytesRead);
-                //    // Get the rest of the data.  
-                //    //client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                //    //    new AsyncCallback(ReceiveCallback), state);
+                    // There might be more data, so store the data received so far.  
+                    //state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+                    //string resp = Encoding.UTF8.GetString(state.buffer, 0, bytesRead);
+                    // Get the rest of the data.  
+                    //client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                      //  new AsyncCallback(ReceiveCallback), state);
                 //}
                 //else
                 //{
